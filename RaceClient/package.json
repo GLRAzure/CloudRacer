@@ -1,0 +1,19 @@
+{
+  "name": "CloudRacer_client",
+  "version": "0.0.0",
+  "description": "CloudRacer_client",
+  "main": "app.js",
+  "author": {
+    "name": "peter",
+    "email": ""
+  },
+  "dependencies": {
+    "azure-storage": "*",
+    "eventhubs-js": "^1.1.0",
+    "express": "3.4.4",
+    "lodash": "*",
+    "serialport": "*",
+    "socket.io": "*",
+    "moment": "*"
+  }
+}

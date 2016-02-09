@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>A Pen by  Captain Anonymous</title>
+    
+    
+    
+    <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+
+    
+    
+    
+    
+  </head>
+
+  <body>
+
+    <div ng-app="CloudRacerApp">
+  <div ng-controller="CloudRacerLeaderboardController as leaderboard">
+    <h2>Cloud Racer</h2>
+    <h3>Scores to beat:</h3>
+    <p>Distance traveled: {{leaderboard.distance.value}} miles by {{leaderboard.distance.playerName}}</p>
+    <p>Highest Speed: {{leaderboard.speed.value}} miles by {{leaderboard.speed.playerName}}</p>
+    <p>Lowest Heart Rate: {{leaderboard.heartrate.value}} miles by {{leaderboard.heartrate.playerName}}</p>
+    <p>Highest Speed to Heart Rate Ratio: {{leaderboard.speedToHR.value}} miles by {{leaderboard.speedToHR.playerName}}</p>
+  </div>
+  <div ng-controller="CloudRacerLiveRaceController as race">
+    <form ng-submit="race.startrace()">
+      <input type="text" ng-model="race.playerName" size="30" placeholder="Enter Player's Name">
+      <input class="btn-primary" type="submit" value="Start">
+    </form>
+  </div>
+</div>
+    <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js'></script>
+<script src='https://cdn.socket.io/socket.io-1.4.5.js'></script>
+<script src='js/socket.js'></script>
+
+        <script src="js/index.js"></script>
+
+    
+    
+    
+  </body>
+</html>
