@@ -27,7 +27,6 @@ namespace MicrosoftBand
     public sealed partial class MainPage : Page
     {
         IBandClient _bandClient;
-        IBandInfo[] pairedBands;
 
         public MainPage()
         {
@@ -112,11 +111,11 @@ namespace MicrosoftBand
             var text = string.Format("steps = {0}", read.TotalSteps);
         }
 
-        private void HeartRate_ReadingChanged(object sender, Microsoft.Band.Sensors.BandSensorReadingEventArgs<Microsoft.Band.Sensors.IBandHeartRateReading> e)
+        async private void HeartRate_ReadingChanged(object sender, Microsoft.Band.Sensors.BandSensorReadingEventArgs<Microsoft.Band.Sensors.IBandHeartRateReading> e)
         {
             var read = e.SensorReading;
             var text = string.Format("heart = {0}\nquality = {1}", read.HeartRate, read.Quality);
-            CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            await CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 this.textBlock.Text = read.HeartRate.ToString();
             });
