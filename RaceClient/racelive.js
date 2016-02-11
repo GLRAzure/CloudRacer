@@ -22,6 +22,7 @@ racelive.init = function(io){
 };
 
 racelive.start = function(playerInfo, lastSensorReading, io){
+    console.log('Starting race for player %s', playerInfo.playerName);
     this.playerName = playerInfo.playerName;
     this.startTime = moment();
     this.endTime = moment(racelive.startTime).add(config.raceLength,'milliseconds');

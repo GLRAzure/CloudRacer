@@ -4,14 +4,15 @@
  Author:	peter
 */
 const int REED_PIN = 7;
-const int RPM_INTERVAL = 50; //ms
-const int RPM_SAMPLES = 100;
+const int LED_PIN = 17;
+const int RPM_INTERVAL = 100; //ms
+const int RPM_SAMPLES = 10;
 
 int prevReed;
-int latchTime = 2; // ms
-int reportInterval = 10; //ms
+int latchTime = 1; // ms
+int reportInterval = 50; //ms
 uint32_t nextReadTime = millis();
-uint32_t nextReportTime = millis();
+uint32_t nextReportTime = 0;
 uint32_t nextSampleTime = millis();
 volatile uint32_t rotations = 0;
 volatile uint32_t curRPM = 0;
@@ -22,12 +23,14 @@ int curReadingIndex = 0;
 // the setup function runs once when you press reset or power the board
 void setup() {
 	pinMode(REED_PIN, INPUT_PULLUP);
-	Serial.begin(1000000);
+  pinMode(LED_PIN, OUTPUT);
+	Serial.begin(250000);
 }
 
 // the loop function runs over and over again until power down or reset
 void loop() {
   int reed = digitalRead(REED_PIN);
+  digitalWrite(LED_PIN, reed);
   if ((reed != prevReed) && (millis() >= nextReadTime)) {
     prevReed = reed;
     nextReadTime = millis() + latchTime;
@@ -43,18 +46,22 @@ void loop() {
     nextSampleTime += RPM_INTERVAL;
 
     curReadingIndex++;
-    if (curReadingIndex > RPM_SAMPLES) curReadingIndex = 0;
+    if (curReadingIndex >= RPM_SAMPLES) curReadingIndex = 0;
   }
   
-  if (millis() >= nextReportTime) {
+  if ((millis() >= nextReportTime)) {  //  && (Serial.availableForWrite() == 0
+    nextReportTime = millis() + reportInterval;
+//    char buffer[100];
+//    memset(buffer, 0, (sizeof(buffer)/sizeof(buffer[0])));
+//    sprintf(buffer, "{ \"time\": %d, \"rotations\": %lu, \"rpm\": %d }\n" , millis(), rotations, curRPM);
+//    Serial.println(buffer);
   	Serial.print("{ \"time\": ");
   	Serial.print(millis(), DEC);
   	Serial.print(", \"rotations\": ");
   	Serial.print(rotations, DEC);
-   Serial.print(", \"rpm\": ");
+    Serial.print(", \"rpm\": ");
     Serial.print(curRPM, DEC);
   	Serial.println("}");
-    nextReportTime += reportInterval;
   }
 }
 

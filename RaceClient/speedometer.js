@@ -26,15 +26,15 @@ speedometer.connect = function(callbackData, callbackError, callbackClose, callb
             return;
         }
         console.log(COMport.comName);
-        this._port = new serialport.SerialPort(COMport.comName, {
-            baudRate: 57600,
+        speedometer._port = new serialport.SerialPort(COMport.comName, {
+            baudRate: 250000,
             parser: serialport.parsers.readline("\n")
         });
         
-        this._port.on('data', serialData(data, callbackData));
-        this._port.on('open', serialData(data, callbackOpen));
-        this._port.on('close', serialData(data, callbackClose));
-        this._port.on('error', serialData(data, callbackError));
+        speedometer._port.on('data', function(data) { serialData(data, callbackData); });
+        speedometer._port.on('open', serialOpen);
+        speedometer._port.on('close', serialClose);
+        speedometer._port.on('error', serialError);
     });
 };
 
@@ -46,9 +46,12 @@ function serialData(serialtext, callbackData) {
     var data;
     try {
         data = JSON.parse(serialtext);
+        console.log("Data: %s", serialtext);
 
     } catch (e) {
         console.log("Malformed JSON received: %s", e);
+        console.log("Text was: %s", serialtext);
+        return;
     }
     speedometer.lastReading.rpm = data.rpm;
     speedometer.lastReading.rotations = data.rotations;

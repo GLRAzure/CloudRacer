@@ -3,15 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <title>Cloud Racer</title>
-    
-    
-    
     <link rel='stylesheet prefetch' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
-
-    
-    
-    
-    
   </head>
 
   <body>     
@@ -46,7 +38,7 @@
                               </div>
                               <div class='row'>
                                   <div class='col-xs-12'>
-                                    <zingchart id="myChart" zc-json="race.raceChartJson" zc-height=300 zc-width=800></zingchart>
+                                    <zingchart id="raceLineChart" zc-json="race.raceChartJson" zc-height=300 zc-width=800></zingchart>
                                 </div>
                               </div>
                               <div class='row'>
@@ -65,8 +57,10 @@
             </div>
         </div>
     </div>
-    <script type="text/javascript" src='https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js'></script>
-    <script type="text/javascript" src='https://cdn.socket.io/socket.io-1.4.5.js'></script>
+    <script type="text/javascript" src='jslibs/lodash.min.js'></script>
+    <script type="text/javascript" src='jslibs/angular.min.js'></script>
+    <script type="text/javascript" src='jslibs/socket.io.js'></script>
+    <!--https://cdn.socket.io/socket.io-1.4.5.js-->
     <script type="text/javascript" src='jslibs/socket.js'></script>
     <script type="text/javascript" src='jslibs/moment.min.js'></script>
     <script type="text/javascript" src="jslibs/zingchart.min.js"></script>

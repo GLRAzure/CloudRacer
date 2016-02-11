@@ -2,7 +2,8 @@ var app = angular.module('CloudRacerApp', ['btford.socket-io', 'zingchart-angula
 var raceDuration = 30000; //ms
 
 app.factory('mySocket', function (socketFactory) {
-  var myIoSocket = io.connect('localhost:8888');
+  var myIoSocket = io.connect(window.location.hostname 
+        + ((window.location.port == '80') ? '' : ':' + window.location.port));
   var mySocket = socketFactory({
     ioSocket: myIoSocket
   });
@@ -31,7 +32,7 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
     race.rpmValues = [];
     race.hrValues = [];
     race.distanceValues = [];
-    race.raceChartJson = {
+    race.raceChartJsonTemplate = {
         type : 'area',
         plot :      { aspect:"spline" }, 
         'scale-x': {
@@ -67,6 +68,8 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
                 }
         ]
     };
+    
+    race.raceChartJson = _.cloneDeep(race.raceChartJsonTemplate);
     
     race.rpmGaugeJson = {
         "type":"gauge", 
@@ -110,38 +113,45 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         ]
     };
 
-    var momStart;
     var nextUpdateTime;
     mySocket.on('playerdata', function(data) {
         race.livestats = data;
     });
     
     mySocket.on('liveRaceData', function(data) {
-        momStart = momStart || moment(data.startTime);
+        race.momStart = race.momStart || moment(data.startTime);
         nextUpdateTime = nextUpdateTime || moment();
         var momentCur = moment(data.readingTime);
-        data.elapsedTime = momentCur.diff(momStart);
-        race.thisRaceData.push(data);
+        data.elapsedTime = momentCur.diff(race.momStart);
+       // race.thisRaceData.push(data);
         if (moment().diff(nextUpdateTime) >= 0) {  // time to update the graph?
-            console.log(data.bpm);
-            race.rpmValues.push([data.elapsedTime,data.rpm]);
-            race.distanceValues.push([data.elapsedTime,data.distance]);
-            race.hrValues.push([data.elapsedTime,data.bpm]);            
+            nextUpdateTime = moment().add(graphUpdateInterval, 'ms'); // set next update time
+            console.log("UI update")
+            race.raceChartJson.series[0].values.push([data.elapsedTime,data.rpm]);  
+       //   race.raceChartJson.series[0].values.push(data.rpm);         
+         //   race.raceChartJson.series[1].values.push([data.elapsedTime,data.distance]);
+         //   race.raceChartJson.series[2].values.push([data.elapsedTime,data.bpm]);  
+                      
             race.rpmGaugeJson.series[0].values = [data.rpm];   
+            
             race.timeGaugeJson.series[0].values = [data.elapsedTime];
+            
             race.hrGaugeJson.series[0].values = [data.bpm];
-            nextUpdateTime = nextUpdateTime.add(graphUpdateInterval, 'ms'); // set next update time
-        }
-        else
-        {
-           
-        }
+            
+       }
+       else
+       {
+         console.log("skipped UI update")
+       }
     });
   
     race.startrace = function() {
+        race.raceChartJson = _.cloneDeep(race.raceChartJsonTemplate);
+        nextUpdateTime = null;
+        race.momStart = null;
         race.thisRaceData = [];
         race.distanceValues.length = 0;
-        race.rpmValues.length = 0;
+        race.raceChartJson.series[0].values = [];
         race.hrValues.length = 0;
         console.log(this.playerName);
         mySocket.emit('start', { "playerName": this.playerName});
