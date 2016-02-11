@@ -27,6 +27,9 @@ app.controller('CloudRacerLiveRaceController', function(mySocket) {
   race.startrace = function() {
     console.log(this.playerName);
     mySocket.emit('start', this.playerName);
+    mySocket.on('playerdata', function(data) {
+        this.livestats = data;
+    });
   };
     
 });
