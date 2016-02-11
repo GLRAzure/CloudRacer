@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var express = require('express');
+//var express = require('express');
 var app = express();
 //var routes = require('./routes');
 var http = require('http');
@@ -19,7 +19,9 @@ var moment = require('moment');
 
 
 var lastSensorOutput;
-var lastBandOutput;
+var lastBandOutput = {
+    bpm: 0;
+};
 var activeRace = false;
 var raceLength = 60000;
 var wheelCirc = 2000; // in mm
@@ -85,11 +87,11 @@ function SerialData(serialtext) {
                 readingTime: moment(),
                 endTime: "",
                 speed: "",
-                rpm: "",
+                rpm: data.rpm,
                 startRotations: raceData.startRotations,
                 rotations: data.rotations,
                 distance: ((data.rotations-data.startRotations)*wheelCirc)/mmInMi,
-                bpm: 1//lastBandOutput.bpm,
+                bpm: lastBandOutput.bpm,
             };
             updateLiveRaceStats(output);
         } else if (activeRace==true) {
@@ -104,7 +106,7 @@ function SerialData(serialtext) {
                 startRotations: raceData.startRotations,
                 rotations: data.rotations,
                 distance: ((data.rotations-data.startRotations)*wheelCirc)/mmInMi,
-                bpm: 1//lastBandOutput.bpm,
+                bpm: lastBandOutput.bpm,
             };
             updateLiveRaceStats(output);
         }
@@ -166,7 +168,7 @@ io.sockets.on('connection', function (socket) {
 
 //start up the Express server
 server.listen(app.get('port'), function () {
-    console.log('Express server listening on port ' + app.get('port'));
+    console.log('web server listening on port ' + app.get('port'));
 });
 
 function startRace(data) {
