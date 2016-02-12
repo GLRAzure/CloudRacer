@@ -14,9 +14,18 @@ var eventHubs = require('eventhubs-js');
 var _ = require('lodash');
 var serialport = require('serialport');
 var moment = require('moment');
+var SQLConnection = require('tedious').Connection;
+var SQLRequest = require('tedious').Request;
 
 
+var sqlConnectionConfig = {
+    userName: 'dbadmin@cloudracer',
+    password: 'cl0udr@c3r',
+    server: 'cloudracer.database.windows.net',
+    options: {encryption: true, database: 'cloudracerdb'}    
+};
 
+var sqlConnection = new SQLConnection(sqlConnectionConfig);
 
 var lastSensorOutput;
 var lastBandOutput = {
@@ -113,6 +122,7 @@ function serialData(serialtext) {
                 bpm: lastBandOutput.bpm,
             };
             updateLiveRaceStats(output);
+            //updateRaceResults('need to pass the race summary data');
         }
     } catch (e) {
         console.log("Malformed JSON received: %s", serialtext);
@@ -206,6 +216,20 @@ function updateLiveRaceStats(data) {
     console.log(JSON.stringify(data));
 }
 
-function updateRaceResults(data) {
-
+function updateRaceResults(data) {    
+    var results = _.reduce(data, function(results, value, field){
+        results.fields.push(field);
+        results.values.push(value);
+        
+        return results;
+    } );
+    
+    var fieldList = results.fields.join(',');
+    var valueList = results.values.join(',');
+    
+    
+    var request = new SQLRequest('insert into raceResults ('+fieldList+') values ('+valueList+')', function(err){
+        if(err)(console.log(err))
+    });
+    sqlConnection.execSql(request);
 }

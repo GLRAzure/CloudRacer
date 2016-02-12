@@ -26,7 +26,7 @@ app.controller('CloudRacerLiveRaceController', function(mySocket) {
   var race = this;
   race.startrace = function() {
     console.log(this.playerName);
-    mySocket.emit('start', this.playerName);
+    mySocket.emit('start', { "playerName": this.playerName});
     mySocket.on('playerdata', function(data) {
         this.livestats = data;
     });
