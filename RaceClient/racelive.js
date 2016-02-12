@@ -48,7 +48,7 @@ racelive.updateRace = function(data) {
         startTime: this.startTime,
         readingTime: data.readingTime,
         endTime: this.endTime,
-        speed: data.rpm*config.wheelCirc/config.mmInMi,
+        speed: (data.rpm * 3)*config.wheelCirc/config.mmInMi,
         rpm: data.rpm,
         startRotations: this.startRotations,
         rotations: data.rotations,

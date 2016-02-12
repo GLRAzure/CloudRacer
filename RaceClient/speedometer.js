@@ -56,6 +56,7 @@ function serialData(serialtext, callbackData) {
     }
     speedometer.lastReading.rpm = data.rpm;
     speedometer.lastReading.rotations = data.rotations;
+    speedometer.lastReading.distance = data.distance;
     speedometer.lastReading.readingTime = moment();
     if(!_.isUndefined(callbackData)) { callbackData(speedometer.lastReading)}
 }
