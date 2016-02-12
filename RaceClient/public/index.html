@@ -9,7 +9,7 @@
   <body>     
     <div ng-app="CloudRacerApp">
         <div class='container-fluid'>
-            <div class='row'>
+            <div class='row' ng-hide="true">
                 <div class='col-xs-12'>
                     <div ng-controller="CloudRacerLeaderboardController as leaderboard">
                         <h2>Cloud Racer</h2>
@@ -27,18 +27,18 @@
                           <div class='container-fluid'>
                               <div class='row'>
                                   <div class='col-xs-4'>
-                                    <zingchart id="myChart2" zc-json="race.rpmGaugeJson" zc-height=300 zc-width=300></zingchart>
+                                    <zingchart id="myChart2" zc-json="race.rpmGaugeJson" zc-height=200 zc-width=200></zingchart>
                                   </div>
                                   <div class='col-xs-4'>
-                                    <zingchart id="myChart3" zc-json="race.timeGaugeJson" zc-height=300 zc-width=300></zingchart>
+                                    <zingchart id="myChart3" zc-json="race.timeGaugeJson" zc-height=200 zc-width=200></zingchart>
                                   </div>
                                   <div class='col-xs-4'>
-                                    <zingchart id="myChart4" zc-json="race.hrGaugeJson" zc-height=300 zc-width=300></zingchart>
+                                    <zingchart id="myChart4" zc-json="race.hrGaugeJson" zc-height=200 zc-width=200></zingchart>
                                   </div>
                               </div>
                               <div class='row'>
                                   <div class='col-xs-12'>
-                                    <zingchart id="raceLineChart" zc-json="race.raceChartJson" zc-height=300 zc-width=800></zingchart>
+                                    <zingchart id="raceLineChart" zc-json="race.raceChartJson" zc-height=250 zc-width=950></zingchart>
                                 </div>
                               </div>
                               <div class='row'>

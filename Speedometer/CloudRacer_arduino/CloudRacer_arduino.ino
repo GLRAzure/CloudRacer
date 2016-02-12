@@ -7,6 +7,9 @@ const int REED_PIN = 7;
 const int LED_PIN = 17;
 const int RPM_INTERVAL = 100; //ms
 const int RPM_SAMPLES = 10;
+const uint32_t MM_PER_ROTATION = 2199;
+const uint32_t NUM_MAGNETS = 2;
+const uint32_t MM_TO_MILE = 1609344;
 
 int prevReed;
 int latchTime = 20; // ms
@@ -70,7 +73,9 @@ void loop() {
   	Serial.print("{ \"time\": ");
   	Serial.print(millis(), DEC);
   	Serial.print(", \"rotations\": ");
-  	Serial.print(rotations, DEC);
+  	Serial.print(rotations / NUM_MAGNETS, DEC);
+   Serial.print(", \"distance\": ");
+    Serial.print(((rotations * MM_PER_ROTATION) / NUM_MAGNETS) / 1000 , DEC);  //meters
     Serial.print(", \"rpm\": ");
     // Serial.print(curRPM, DEC);
     Serial.print(10000/ (timeBetweenPulses), DEC); // 3 wheel rotations per pedal rotation, 2 magnets

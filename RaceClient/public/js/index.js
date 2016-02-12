@@ -26,7 +26,8 @@ app.controller('CloudRacerLeaderboardController', function() {
 
 app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
     var race = this;
-    var graphUpdateInterval = 100;
+    var graphUpdateInterval = 1000;
+    var gaugeUpdateInterval = 1000;
 
     race.thisRaceData = [];
     race.rpmValues = [];
@@ -113,7 +114,8 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         ]
     };
 
-    var nextUpdateTime;
+    var nextUpdateTime, nextGaugeUpdateTime;
+    var lastDataFrame;
     mySocket.on('playerdata', function(data) {
         race.livestats = data;
     });
@@ -121,29 +123,50 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
     mySocket.on('liveRaceData', function(data) {
         race.momStart = race.momStart || moment(data.startTime);
         nextUpdateTime = nextUpdateTime || moment();
+        nextGaugeUpdateTime = nextGaugeUpdateTime || moment();
         var momentCur = moment(data.readingTime);
         data.elapsedTime = momentCur.diff(race.momStart);
+        lastDataFrame = data;
        // race.thisRaceData.push(data);
         if (moment().diff(nextUpdateTime) >= 0) {  // time to update the graph?
-            nextUpdateTime = moment().add(graphUpdateInterval, 'ms'); // set next update time
-            console.log("UI update")
-            race.raceChartJson.series[0].values.push([data.elapsedTime,data.rpm]);  
-       //   race.raceChartJson.series[0].values.push(data.rpm);         
-         //   race.raceChartJson.series[1].values.push([data.elapsedTime,data.distance]);
-         //   race.raceChartJson.series[2].values.push([data.elapsedTime,data.bpm]);  
-                      
-            race.rpmGaugeJson.series[0].values = [data.rpm];   
+            console.log('updating graph');
+            nextUpdateTime.add(graphUpdateInterval, 'ms'); // set next update time
+           updateRaceStatusDataChart(data);
             
-            race.timeGaugeJson.series[0].values = [data.elapsedTime];
+        }
+        if (moment().diff(nextGaugeUpdateTime) >= 0) {  // time to update the graph?
+            console.log('updating gauges');
+            nextGaugeUpdateTime.add(gaugeUpdateInterval, 'ms'); // set next update time
+            updateRaceStatusDataGauge(data);
             
-            race.hrGaugeJson.series[0].values = [data.bpm];
-            
-       }
-       else
-       {
-         console.log("skipped UI update")
-       }
+        }
+       
     });
+    
+    mySocket.on('liveRaceStop', function(raceStats) {
+        console.log("Race over. Status:");
+        console.log(raceStats);
+        updateRaceStatusDataGauge(lastDataFrame); // push the last data frame to complete the graphs
+        updateRaceStatusDataChart(lastDataFrame); 
+    });
+    
+    function updateRaceStatusDataChart(data)
+    {         
+        race.raceChartJson.series[0].values.push([data.elapsedTime,data.rpm]);  
+    //   race.raceChartJson.series[0].values.push(data.rpm);         
+        race.raceChartJson.series[1].values.push([data.elapsedTime,data.distance]);
+        race.raceChartJson.series[2].values.push([data.elapsedTime,data.bpm]);  
+
+    }
+    
+    function updateRaceStatusDataGauge(data)
+    {         
+        race.rpmGaugeJson.series[0].values = [data.rpm];   
+        
+        race.timeGaugeJson.series[0].values = [data.elapsedTime];
+        
+        race.hrGaugeJson.series[0].values = [data.bpm];
+    }
   
     race.startrace = function() {
         race.raceChartJson = _.cloneDeep(race.raceChartJsonTemplate);
