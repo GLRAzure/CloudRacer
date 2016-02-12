@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-//var express = require('express');
+var express = require('express');
 var app = express();
 //var routes = require('./routes');
 var http = require('http');
@@ -20,8 +20,9 @@ var moment = require('moment');
 
 var lastSensorOutput;
 var lastBandOutput = {
-    bpm: 0;
+    bpm: 0
 };
+var fakeSerialInterval;
 var activeRace = false;
 var raceLength = 60000;
 var wheelCirc = 2000; // in mm
@@ -57,23 +58,25 @@ function initSerialPort() {
     serialport.list(function (err, ports) {
         var COMport = _.find(ports, function (p) { return p.pnpId.search('VID_2341&PID_8036') > 0; })
         if (_.isUndefined(COMport)) {
-            console.log("Bike sensor not found. No sensor data will be returned.");
+            console.log("Bike sensor not found. virtual sensor data will be returned.");
+            var data = '{ "rotations": 0, "rpm": 0}';
+            fakeSerialInterval = setInterval(function(data) {serialData(data);}, 20, data);
             return;
         }
         console.log(COMport.comName);
         port = new serialport.SerialPort(COMport.comName, {
-            baudRate: 1000000,
+            baudRate: 57600,
             parser: serialport.parsers.readline("\n")
         });
         
         port.on('open', serialOpen);
-        port.on('data', SerialData);
+        port.on('data', serialData);
         port.on('close', serialClose);
         port.on('error', serialError);
     });
 }
 
-function SerialData(serialtext) {
+function serialData(serialtext) {
     var data;
     try {
         data = JSON.parse(serialtext);
