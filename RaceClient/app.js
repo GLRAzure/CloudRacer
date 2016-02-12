@@ -51,6 +51,7 @@ function initBand() {
 
 function bandData(data) {
     var output = JSON.parse(data);
+    console.log("Band Data Received: %s", data);
     lastBandOutput.bpm = output.bpm;
 }
 
