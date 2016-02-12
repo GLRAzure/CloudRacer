@@ -2,7 +2,7 @@ var config = {}
 
 config.deviceId = 'VID_2341&PID_8036';
 config.raceLength = 30000;
-config.wheelCirc = 2000; // in mm
+config.wheelCirc = 2199; // in mm
 config.mmInMi = 1609344;
 
 config.tablestorage = {
