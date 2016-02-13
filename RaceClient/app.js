@@ -49,6 +49,7 @@ var raceData = {
 
 var port;
 
+/*
 function initBand() {
     const spawn = require('child_process').spawn;
     const bandSensorApp = spawn('bandSensorApp.exe', []);
@@ -57,6 +58,7 @@ function initBand() {
         bandData(data);
     });
 }
+*/
 
 function bandData(data) {
     var output = JSON.parse(data);
@@ -69,7 +71,7 @@ function initSerialPort() {
         var COMport = _.find(ports, function (p) { return p.pnpId.search('VID_2341&PID_8036') > 0; })
         if (_.isUndefined(COMport)) {
             console.log("Bike sensor not found. virtual sensor data will be returned.");
-            var data = '{ "rotations": 0, "rpm": 0}';
+            var data = '{ "rotations": 0, "rpm": 100}';
             fakeSerialInterval = setInterval(function(data) {serialData(data);}, 20, data);
             return;
         }
@@ -93,22 +95,31 @@ function serialData(serialtext) {
         data.readingTime = moment();
         //console.log("%s", JSON.stringify(data));
         lastSensorOutput = data;
-        if(activeRace==true && data.readingTime.isBefore(raceData.endTime)) {
+        
+        if(activeRace==true) {
             var output = {
                 playerName: raceData.playerName,
                 startTime: raceData.startTime,
-                readingTime: moment(),
-                endTime: "",
-                speed: "",
+                readingTime: data.readingTime,
+                endTime: raceData.endTime,
+                speed: data.rpm*wheelCirc/mmInMi,
                 rpm: data.rpm,
                 startRotations: raceData.startRotations,
                 rotations: data.rotations,
                 distance: ((data.rotations-data.startRotations)*wheelCirc)/mmInMi,
                 bpm: lastBandOutput.bpm,
             };
-            updateLiveRaceStats(output);
-        } else if (activeRace==true) {
-            activeRace = false;
+            if (data.readingTime.isBefore(raceData.endTime)){
+                updateLiveRaceStats(output);
+            } else {
+                activeRace = false;
+                updateLiveRaceStats(output);
+                updateRaceResults({"id":1,"name":"Bob"});
+            }
+            
+        //} else if (activeRace==true) {
+            
+            /*
             var output = {
                 playerName: raceData.playerName,
                 startTime: raceData.startTime,
@@ -121,8 +132,9 @@ function serialData(serialtext) {
                 distance: ((data.rotations-data.startRotations)*wheelCirc)/mmInMi,
                 bpm: lastBandOutput.bpm,
             };
-            updateLiveRaceStats(output);
-            //updateRaceResults('need to pass the race summary data');
+            */
+            //updateLiveRaceStats(output);
+            //
         }
     } catch (e) {
         console.log("Malformed JSON received: %s", serialtext);
@@ -186,14 +198,11 @@ server.listen(app.get('port'), function () {
 });
 
 function startRace(data) {
-    var time = moment();
-    raceData = { 
-        playerName: data.playerName,
-        startTime: time,
-        endTime: time.add(raceLength,'milliseconds'),
-        rotationsStart: lastSensorOutput.rotations,
-        sensorData: []
-    };
+    raceData.playerName = data.playerName;
+    raceData.startTime = moment();
+    raceData.endTime = moment(raceData.startTime).add(raceLength,'milliseconds');
+    raceData.startRotations = lastSensorOutput.rotations;
+    raceData.sensorData =  [];
     activeRace = true;
 }
 
@@ -217,19 +226,19 @@ function updateLiveRaceStats(data) {
 }
 
 function updateRaceResults(data) {    
-    var results = _.reduce(data, function(results, value, field){
-        results.fields.push(field);
-        results.values.push(value);
+    var results = _.reduce(data, function(result, value, field){
+        result.fields.push(field);
+        result.values.push(value);
         
-        return results;
-    } );
+        return result;
+    }, {fields:[], values:[]} );
     
     var fieldList = results.fields.join(',');
     var valueList = results.values.join(',');
     
-    
-    var request = new SQLRequest('insert into raceResults ('+fieldList+') values ('+valueList+')', function(err){
+    var query = 'insert into raceResults ('+fieldList+') values ('+valueList+')';
+    var request = new SQLRequest(query, function(err){
         if(err)(console.log(err))
     });
-    sqlConnection.execSql(request);
+    //sqlConnection.execSql(request);
 }
