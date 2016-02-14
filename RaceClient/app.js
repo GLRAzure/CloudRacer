@@ -3,6 +3,8 @@
  * Module dependencies.
  */
 
+var config = require('./config');
+var speedometer = require('./speedometer');
 var express = require('express');
 var app = express();
 //var routes = require('./routes');
@@ -14,18 +16,6 @@ var eventHubs = require('eventhubs-js');
 var _ = require('lodash');
 var serialport = require('serialport');
 var moment = require('moment');
-var SQLConnection = require('tedious').Connection;
-var SQLRequest = require('tedious').Request;
-
-
-var sqlConnectionConfig = {
-    userName: 'dbadmin@cloudracer',
-    password: 'cl0udr@c3r',
-    server: 'cloudracer.database.windows.net',
-    options: {encryption: true, database: 'cloudracerdb'}    
-};
-
-var sqlConnection = new SQLConnection(sqlConnectionConfig);
 
 var lastSensorOutput;
 var lastBandOutput = {
@@ -33,11 +23,9 @@ var lastBandOutput = {
 };
 var fakeSerialInterval;
 var activeRace = false;
-var raceLength = 60000;
-var wheelCirc = 2000; // in mm
-var mmInMi = 1609344;
-
-
+//var raceLength = 60000;
+//var wheelCirc = 2000; // in mm
+//var mmInMi = 1609344;
 
 var raceData = { 
     playerName: "",
@@ -47,28 +35,17 @@ var raceData = {
     sensorData: []
 };
 
-var port;
-
-/*
-function initBand() {
-    const spawn = require('child_process').spawn;
-    const bandSensorApp = spawn('bandSensorApp.exe', []);
-
-    bandSensorApp.stdout.on('data', function(data) {
-        bandData(data);
-    });
-}
-*/
+//var port;
 
 function bandData(data) {
     var output = JSON.parse(data);
     console.log("Band Data Received: %s", data);
     lastBandOutput.bpm = output.bpm;
 }
-
+ /*
 function initSerialPort() {
     serialport.list(function (err, ports) {
-        var COMport = _.find(ports, function (p) { return p.pnpId.search('VID_2341&PID_8036') > 0; })
+        var COMport = _.find(ports, function (p) { return p.pnpId.search(config.deviceId) > 0; })
         if (_.isUndefined(COMport)) {
             console.log("Bike sensor not found. virtual sensor data will be returned.");
             var data = '{ "rotations": 0, "rpm": 100}';
@@ -87,58 +64,42 @@ function initSerialPort() {
         port.on('error', serialError);
     });
 }
+*/
 
-function serialData(serialtext) {
-    var data;
-    try {
-        data = JSON.parse(serialtext);
-        data.readingTime = moment();
-        //console.log("%s", JSON.stringify(data));
-        lastSensorOutput = data;
-        
-        if(activeRace==true) {
-            var output = {
-                playerName: raceData.playerName,
-                startTime: raceData.startTime,
-                readingTime: data.readingTime,
-                endTime: raceData.endTime,
-                speed: data.rpm*wheelCirc/mmInMi,
-                rpm: data.rpm,
-                startRotations: raceData.startRotations,
-                rotations: data.rotations,
-                distance: ((data.rotations-data.startRotations)*wheelCirc)/mmInMi,
-                bpm: lastBandOutput.bpm,
-            };
-            if (data.readingTime.isBefore(raceData.endTime)){
-                updateLiveRaceStats(output);
-            } else {
-                activeRace = false;
-                updateLiveRaceStats(output);
-                updateRaceResults({"id":1,"name":"Bob"});
-            }
-            
-        //} else if (activeRace==true) {
-            
-            /*
-            var output = {
-                playerName: raceData.playerName,
-                startTime: raceData.startTime,
-                readingTime: moment(),
-                endTime: moment(),
-                speed: "",
-                rpm: "",
-                startRotations: raceData.startRotations,
-                rotations: data.rotations,
-                distance: ((data.rotations-data.startRotations)*wheelCirc)/mmInMi,
-                bpm: lastBandOutput.bpm,
-            };
-            */
-            //updateLiveRaceStats(output);
-            //
+function serialData(data) {
+    //var data;
+    //try {
+    //    data = JSON.parse(serialtext);
+    //} catch (e) {
+    //    console.log("Malformed JSON received: %s", serialtext);
+    //}
+    
+    //data.readingTime = moment();
+    //console.log("%s", JSON.stringify(data));
+    lastSensorOutput = data;
+    
+    if(activeRace==true) {
+        var output = {
+            playerName: raceData.playerName,
+            startTime: raceData.startTime,
+            readingTime: data.readingTime,
+            endTime: raceData.endTime,
+            speed: data.rpm*config.wheelCirc/config.mmInMi,
+            rpm: data.rpm,
+            startRotations: raceData.startRotations,
+            rotations: data.rotations,
+            distance: ((data.rotations-data.startRotations)*config.wheelCirc)/config.mmInMi,
+            bpm: lastBandOutput.bpm,
+        };
+        if (data.readingTime.isBefore(raceData.endTime)){
+            updateLiveRaceStats(output);
+        } else {
+            activeRace = false;
+            updateLiveRaceStats(output);
+            updateRaceResults({"id":1,"name":"Bob"});
         }
-    } catch (e) {
-        console.log("Malformed JSON received: %s", serialtext);
     }
+
 }
 
 function serialOpen() {
@@ -153,15 +114,10 @@ function serialError(error) {
     console.log('Serial port error: ' + error);
 }
 
+//initSerialPort();
+speedometer.connect(function (data) {serialData(data)});
 
-initSerialPort();
-
-eventHubs.init({
-    hubNamespace: "cloudracer",
-    hubName: "racetelemetry",
-    keyName: "raceowner",
-    key: "8w3z+bUOryua0Tc39yePrIALm0xxBy1d0BUCGZ42y0k="
-});
+eventHubs.init(config.eventhub);
 
 // all environments
 app.set('port', process.env.PORT || 8888);
@@ -200,7 +156,7 @@ server.listen(app.get('port'), function () {
 function startRace(data) {
     raceData.playerName = data.playerName;
     raceData.startTime = moment();
-    raceData.endTime = moment(raceData.startTime).add(raceLength,'milliseconds');
+    raceData.endTime = moment(raceData.startTime).add(config.raceLength,'milliseconds');
     raceData.startRotations = lastSensorOutput.rotations;
     raceData.sensorData =  [];
     activeRace = true;
@@ -237,8 +193,10 @@ function updateRaceResults(data) {
     var valueList = results.values.join(',');
     
     var query = 'insert into raceResults ('+fieldList+') values ('+valueList+')';
+    /*
     var request = new SQLRequest(query, function(err){
         if(err)(console.log(err))
     });
     //sqlConnection.execSql(request);
+    */
 }
