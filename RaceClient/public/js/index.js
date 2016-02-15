@@ -31,5 +31,8 @@ app.controller('CloudRacerLiveRaceController', function(mySocket) {
         this.livestats = data;
     });
   };
+  race.sendBandData = function() {
+      mySocket.emit('banddata', '{ "bpm": 5 }');
+  };
     
 });

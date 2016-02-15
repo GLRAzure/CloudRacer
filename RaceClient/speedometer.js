@@ -51,22 +51,22 @@ function serialData(serialtext, callbackData) {
     speedometer.lastReading.rpm = data.rpm;
     speedometer.lastReading.rotations = data.rotations;
     speedometer.lastReading.readingTime = moment();
-    if(!_.isNull(callbackData)) { callbackData(speedometer.lastReading)}
+    if(!_.isUndefined(callbackData)) { callbackData(speedometer.lastReading)}
 }
 
 function serialOpen(callbackOpen) {
     console.log('port open. Data rate: ' + speedometer._port.options.baudRate);
-    if(!_.isNull(callbackOpen)) { callbackOpen()}
+    if(!_.isUndefined(callbackOpen)) { callbackOpen()}
 }
 
 function serialClose(callbackClosed) {
     console.log('port closed.');
-    if(!_.isNull(callbackClosed)) { callbackClosed()}
+    if(!_.isUndefined(callbackClosed)) { callbackClosed()}
 }
 
 function serialError(error, callbackError) {
     console.log('Serial port error: ' + error);
-    if(!_.isNull(callbackError)) { callbackError(error)}
+    if(!_.isUndefined(callbackError)) { callbackError(error)}
 }
 
 module.exports = speedometer;
