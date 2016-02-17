@@ -50,7 +50,7 @@ racelive.updateRace = function(data) {
     } else {
         this.activeRace = false;
         this._updateLiveStats(output);
-        this._updateRaceResults({"id":1,"name":"Bob"});
+        this._updateRaceResults(output);
     }
 }
 
@@ -78,18 +78,24 @@ racelive._updateRaceResults = function (data) {
     sql.connect(config.mssql, function(err) {
         var request = new sql.Request();
         request.input('playerName', data.playerName);
-        request.input('startTime', data.startTime);
-        request.input('endTime', data.endTime);
+        request.input('startTime', new Date(data.startTime));
+        request.input('endTime', new Date(data.endTime));
         request.input('distance', data.distance);
         request.input('maxSpeed', 0);
         request.input('maxDistancePerBeat', 0);
         request.input('maxAcceleration', 0);
-        request.input('maxAcellPerBeat', 0);
-        request.input('sensordata', JSON.stringify(data.sensorData));
+        request.input('maxAccelPerBeat', 0);
+        //request.input('sensordata', JSON.stringify(data.sensorData));
         
-        var query = 'insert into raceResults (playerName, startTime, endTime, distance, maxSpeed, maxDistancePerBeat, maxAcceleration, maxAccelPerBeat, sensorData) '+
-        'values (@playerName, @startTime, @endTime, @distance, @maxSpeed, @maxDistancePerBeat, @maxAcceleration, @maxAccelPerBeat, @sensorData)';
-        //request.query(query);
+        var query = 'insert into raceResults (playerName, startTime, endTime, distance, maxSpeed, maxDistancePerBeat, maxAcceleration, maxAccelPerBeat) '+
+        'values (@playerName, @startTime, @endTime, @distance, @maxSpeed, @maxDistancePerBeat, @maxAcceleration, @maxAccelPerBeat)';
+        request.query(query, function(err, rs) {
+          if (err)  {
+              console.log(err);
+          } else {
+              console.log('yes');
+          }
+        });
     });
 }
 
