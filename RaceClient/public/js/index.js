@@ -24,12 +24,12 @@ app.controller('CloudRacerLeaderboardController', function() {
   }); 
 
 app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
-  var race = this;
-  var graphUpdateInterval = 100;
-  
-  race.thisRaceData = [];
-  race.rpmValues = [];
-  race.distanceValues = [];
+    var race = this;
+    var graphUpdateInterval = 100;
+
+    race.thisRaceData = [];
+    race.rpmValues = [];
+    race.distanceValues = [];
     race.raceChartJson = {
         type : 'area',
         plot :      { aspect:"spline" }, 
@@ -61,16 +61,13 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
                 }
         ]
     };
-  
-  race.startrace = function() {
+
     var momStart;
     var nextUpdateTime;
-    race.thisRaceData = [];
-    console.log(this.playerName);
-    mySocket.emit('start', { "playerName": this.playerName});
     mySocket.on('playerdata', function(data) {
         race.livestats = data;
     });
+    
     mySocket.on('liveRaceData', function(data) {
         momStart = momStart || moment(data.startTime);
         nextUpdateTime = nextUpdateTime || moment();
@@ -82,12 +79,17 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
             race.distanceValues.push([data.elapsedTime,data.disance]);            
             nextUpdateTime = nextUpdateTime.add(graphUpdateInterval, 'ms'); // set next update time
         }
-        
-
     });
-  };
-  race.sendBandData = function() {
-      mySocket.emit('banddata', '{ "bpm": 5 }');
-  };
+  
+    race.startrace = function() {
+        race.thisRaceData = [];
+        race.distanceValues.length = 0;
+        race.rpmValues.length = 0;
+        console.log(this.playerName);
+        mySocket.emit('start', { "playerName": this.playerName});
+    };
+    race.sendBandData = function() {
+        mySocket.emit('banddata', '{ "bpm": 5 }');
+    };
     
 });
