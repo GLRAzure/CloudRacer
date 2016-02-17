@@ -2,7 +2,7 @@
 <html >
   <head>
     <meta charset="UTF-8">
-    <title>A Pen by  Captain Anonymous</title>
+    <title>Cloud Racer</title>
     
     
     
@@ -14,34 +14,41 @@
     
   </head>
 
-  <body>
-
+  <body>     
     <div ng-app="CloudRacerApp">
-  <div ng-controller="CloudRacerLeaderboardController as leaderboard">
-    <h2>Cloud Racer</h2>
-    <h3>Scores to beat:</h3>
-    <p>Distance traveled: {{leaderboard.distance.value}} miles by {{leaderboard.distance.playerName}}</p>
-    <p>Highest Speed: {{leaderboard.speed.value}} miles by {{leaderboard.speed.playerName}}</p>
-    <p>Lowest Heart Rate: {{leaderboard.heartrate.value}} miles by {{leaderboard.heartrate.playerName}}</p>
-    <p>Highest Speed to Heart Rate Ratio: {{leaderboard.speedToHR.value}} miles by {{leaderboard.speedToHR.playerName}}</p>
-  </div>
-  <div ng-controller="CloudRacerLiveRaceController as race">
-    <form ng-submit="race.startrace()">
-      <input type="text" ng-model="race.playerName" size="30" placeholder="Enter Player's Name">
-      <input class="btn-primary" type="submit" value="Start">
-    </form>
-    <button ng-click="race.sendBandData()">send</button>
-    <p ng-model="race.livestats"></p>
-  </div>
-</div>
+        <div class='container-fluid'>
+            <div class='row'>
+                <div class='col-xs-12'>
+                    <div ng-controller="CloudRacerLeaderboardController as leaderboard">
+                        <h2>Cloud Racer</h2>
+                        <h3>Scores to beat:</h3>
+                        <p>Distance traveled: {{leaderboard.distance.value}} miles by {{leaderboard.distance.playerName}}</p>
+                        <p>Highest Speed: {{leaderboard.speed.value}} miles by {{leaderboard.speed.playerName}}</p>
+                        <p>Lowest Heart Rate: {{leaderboard.heartrate.value}} miles by {{leaderboard.heartrate.playerName}}</p>
+                        <p>Highest Speed to Heart Rate Ratio: {{leaderboard.speedToHR.value}} miles by {{leaderboard.speedToHR.playerName}}</p>
+                    </div>                  
+                </div> 
+            </div>
+            <div class='row'>
+                <div class='col-xs-12'>
+                      <div ng-controller="CloudRacerLiveRaceController as race">
+                        <zingchart id="myChart" zc-json="race.raceChartJson" zc-height=500 zc-width=800></zingchart>
+                        <form ng-submit="race.startrace()">
+                        <input type="text" ng-model="race.playerName" size="30" placeholder="Enter Player's Name">
+                        <input class="btn-primary" type="submit" value="Start">
+                        </form>
+                        <button ng-click="race.sendBandData()">send</button>                      
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
     <script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.5.0/angular.min.js'></script>
-<script src='https://cdn.socket.io/socket.io-1.4.5.js'></script>
-<script src='js/socket.js'></script>
-
-        <script src="js/index.js"></script>
-
-    
-    
-    
+    <script src='https://cdn.socket.io/socket.io-1.4.5.js'></script>
+    <script src='js/socket.js'></script>
+    <script type="text/javascript" src='jslibs/moment.min.js'></script>
+    <script type="text/javascript" src="jslibs/zingchart.min.js"></script>
+    <script type="text/javascript" src="jslibs/zingchart-angularjs.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
   </body>
 </html>
