@@ -93,7 +93,7 @@ racelive._updateRaceResults = function (data) {
           if (err)  {
               console.log(err);
           } else {
-              console.log('yes');
+              console.log('racer results updated.');
           }
         });
     });
