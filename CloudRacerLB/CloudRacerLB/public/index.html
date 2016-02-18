@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title>Cloud Racer Leaderboard</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script>
+        // Initialize the socket connection
+        var socket = io.connect();
+        // Ask client (browser input box) to enter text
+        function getLeaderList() {
+            socket.emit('getleaders', 'all');
+        }
+        // Displaymessage event received at all clients
+        // display in alert dialog box
+        socket.on('displayleaders', function (data) {
+            console.log('leaders received.');
+            console.log(data);
+        });
+
+    </script>
+
+</head>
+<body onload="getLeaderList();">
+    <h1>Cloud Racer Leaders</h1> 
+    <table border='1'>
+
+    </table>
+</body>
+</html>

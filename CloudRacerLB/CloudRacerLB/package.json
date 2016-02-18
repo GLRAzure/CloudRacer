@@ -1,0 +1,16 @@
+{
+  "name": "CloudRacerLB",
+  "version": "0.0.0",
+  "description": "CloudRacerLB",
+  "main": "app.js",
+  "author": {
+    "name": "jaerrett",
+    "email": "jaerrett@microsoft.com"
+  },
+  "dependencies": {
+    "azure-storage": "*",
+    "express": "3.4.4",
+    "mssql": "*",
+    "socket.io": "^1.4.5"
+  }
+}
