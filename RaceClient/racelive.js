@@ -90,12 +90,12 @@ racelive._updateRaceResults = function (data) {
         request.input('startTime', new Date(data.startTime));
         request.input('endTime', new Date(data.endTime));
         request.input('distance', data.distance);
-        request.input('maxSpeed', raceStats.maxSpeed);
+        request.input('maxSpeed', racelive.raceStats.maxSpeed);
         request.input('maxDistancePerBeat', 0);
         request.input('maxAcceleration', 0);
         request.input('maxAccelPerBeat', 0);
-        request.input('maxBPM', racestats.maxBPM);
-        //request.input('sensordata', JSON.stringify(data.sensorData));
+        request.input('maxBPM', racelive.raceStats.maxBPM);
+        //request.input('sensordata', JSON.stringify(this.raceStats.sensorData));
         
         var query = 'insert into raceResults (playerName, startTime, endTime, distance, maxSpeed, maxDistancePerBeat, maxAcceleration, maxAccelPerBeat, maxBPM) '+
         'values (@playerName, @startTime, @endTime, @distance, @maxSpeed, @maxDistancePerBeat, @maxAcceleration, @maxAccelPerBeat, @maxBPM)';
