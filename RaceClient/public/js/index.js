@@ -100,7 +100,7 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         "type":"gauge", 
         "scale-r":{
             "aperture":300,     //Specify your scale range.
-            "values":"50:220:10" //Provide min/max/step scale values.
+            "values":"60:220:10" //Provide min/max/step scale values.
         },
         "title": {
             "text":"Heart Rate"
@@ -123,6 +123,7 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         data.elapsedTime = momentCur.diff(momStart);
         race.thisRaceData.push(data);
         if (moment().diff(nextUpdateTime) >= 0) {  // time to update the graph?
+            console.log(data.bpm);
             race.rpmValues.push([data.elapsedTime,data.rpm]);
             race.distanceValues.push([data.elapsedTime,data.distance]);
             race.hrValues.push([data.elapsedTime,data.bpm]);            
@@ -131,8 +132,9 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
             race.hrGaugeJson.series[0].values = [data.bpm];
             nextUpdateTime = nextUpdateTime.add(graphUpdateInterval, 'ms'); // set next update time
         }
-        else{
-            console.log("skipping GUI update");
+        else
+        {
+           
         }
     });
   
