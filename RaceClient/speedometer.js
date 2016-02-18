@@ -16,8 +16,10 @@ speedometer.connect = function(callbackData, callbackError, callbackClose, callb
         var COMport = _.find(ports, function (p) { return p.pnpId.search(config.deviceId) > 0; })
         if (_.isUndefined(COMport)) {
             console.log("Bike sensor not found. virtual sensor data will be returned.");
-            var data = '{ "rotations": 0, "rpm": 100 }';
+            
+            var data = '{ "rotations": 0, "rpm": 0 }';
             setInterval(function(data) {
+                data = '{ "rotations": 0, "rpm": ' + Math.floor((Math.random() * 10) + 1) + ' }';
                 serialData(data, callbackData);
             }, 20, data);
 

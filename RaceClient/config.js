@@ -5,6 +5,12 @@ config.raceLength = 30000;
 config.wheelCirc = 2000; // in mm
 config.mmInMi = 1609344;
 
+config.tablestorage = {
+	tableName: "cloudracertelemetry",
+	accountName: "cloudracerstorage",
+	accountKey: "p+RE6nrOJ6kOqxwNNJYOAgJLxq5Y4rmkOooeTKLni09GcQdXrZoq0JDxCJl9zWu4LmZIsskVNJ6qUsTzzmG/Ug=="
+}
+
 config.mssql = {
 	server: 'cloudracer.database.windows.net',
 	database: 'cloudracerdb',
