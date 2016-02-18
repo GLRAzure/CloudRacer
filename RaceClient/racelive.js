@@ -3,14 +3,7 @@ var moment = require('moment');
 var eventHubs = require('eventhubs-js');
 var sql = require('mssql');
 var _ = require('lodash');
-
-var racestats = {};
-
-racestats.maxSpeed = 0;
-racestats.maxBPM = 0;
-racestats.maxDistancePerBeat = 0;
-racestats.maxAcceleration = 0;
-racestats.maxAccelerationPerBeat = 0;
+var racestats_beginning = {maxSpeed:0, maxBPM: 0, maxDistancePerBeat: 0, maxAcceleration: 0, maxAccelerationPerBeat: 0};
 
 var racelive = {};
 
@@ -21,6 +14,7 @@ racelive.startRotations;
 racelive.sensordata = [];
 racelive.activeRace = false;
 racelive._io;
+racelive.raceStats = racestats_beginning;
 
 racelive.init = function(io){
     eventHubs.init(config.eventhub);
@@ -33,11 +27,16 @@ racelive.start = function(playerInfo, lastSensorReading, io){
     this.endTime = moment(racelive.startTime).add(config.raceLength,'milliseconds');
     this.startRotations = lastSensorReading.rotations;
     this.sensorData =  [lastSensorReading];
+    this.raceStats = racestats_beginning;
     this.activeRace = true;
+    this._io.sockets.emit('liveRaceStart', { raceLength: config.raceLength});
 };
 
-racelive.stop = function () {
-    this.activeRace = false;    
+racelive.stop = function (data) {
+    this.activeRace = false;
+    data.sensorData = this.sensordata;
+    data.raceStats = this.raceStats;
+    this._io.sockets.emit('liveRaceStop', data);
 };
 
 racelive.updateRace = function(data) {
@@ -57,22 +56,20 @@ racelive.updateRace = function(data) {
     
     if (this.sensorData.length > 20)
         output.acceleration = output.speed - this.sensorData[this.sensorData.length - 20].speed;
-        if (output.acceleration > racestats.maxAcceleration)
-            racestats.maxAcceleration = output.acceleration;
+        if (output.acceleration > this.raceStats.maxAcceleration)
+            this.raceStats.maxAcceleration = output.acceleration;
     
-    if (output.bpm > racestats.maxBPM)
-        racestats.maxBPM = output.bpm;
+    if (output.bpm > this.raceStats.maxBPM)
+        this.raceStats.maxBPM = output.bpm;
         
-    if (output.speed > racestats.maxSpeed)
-        racestats.maxSpeed = output.speed;
-        
-    
+    if (output.speed > this.raceStats.maxSpeed)
+        this.raceStats.maxSpeed = output.speed;
     
     if (data.readingTime.isBefore(this.endTime)){
         this._updateLiveStats(output);
     } else {
-        this.activeRace = false;
         this._updateLiveStats(output);
+        this.stop(output);
         this._updateRaceResults(output);
     }
 }
@@ -86,30 +83,19 @@ racelive._updateLiveStats = function(data){
 };
 
 racelive._updateRaceResults = function (data) { 
-    /*
-    var results = _.reduce(data, function(result, value, field){
-        result.fields.push(field);
-        result.values.push(value);
-        
-        return result;
-    }, {fields:[], values:[]} );
-    
-    var fieldList = results.fields.join(',');
-    var valueList = results.values.join(',');
-    */
-    
+
     sql.connect(config.mssql, function(err) {
         var request = new sql.Request();
         request.input('playerName', data.playerName);
         request.input('startTime', new Date(data.startTime));
         request.input('endTime', new Date(data.endTime));
         request.input('distance', data.distance);
-        request.input('maxSpeed', racestats.maxSpeed);
+        request.input('maxSpeed', racelive.raceStats.maxSpeed);
         request.input('maxDistancePerBeat', 0);
         request.input('maxAcceleration', 0);
         request.input('maxAccelPerBeat', 0);
-        request.input('maxBPM', racestats.maxBPM);
-        //request.input('sensordata', JSON.stringify(data.sensorData));
+        request.input('maxBPM', racelive.raceStats.maxBPM);
+        //request.input('sensordata', JSON.stringify(this.raceStats.sensorData));
         
         var query = 'insert into raceResults (playerName, startTime, endTime, distance, maxSpeed, maxDistancePerBeat, maxAcceleration, maxAccelPerBeat, maxBPM) '+
         'values (@playerName, @startTime, @endTime, @distance, @maxSpeed, @maxDistancePerBeat, @maxAcceleration, @maxAccelPerBeat, @maxBPM)';
