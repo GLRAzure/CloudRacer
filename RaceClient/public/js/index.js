@@ -29,6 +29,7 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
 
     race.thisRaceData = [];
     race.rpmValues = [];
+    race.hrValues = [];
     race.distanceValues = [];
     race.raceChartJson = {
         type : 'area',
@@ -58,6 +59,11 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
                 text: 'Distance',
                 values : race.distanceValues,
                 marker: { visible: 0 }
+                },
+        { 
+                text: 'Heart Rate',
+                values : race.hrValues,
+                marker: { visible: 0 }
                 }
         ]
     };
@@ -70,6 +76,34 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         },
         "title": {
             "text":"RPM"
+            },
+        "series":[
+            {"values":[0]}
+        ]
+    };
+    
+    race.timeGaugeJson = {
+        "type":"gauge", 
+        "scale-r":{
+            "aperture":360,     //Specify your scale range.
+            "values":"0:60000:5000" //Provide min/max/step scale values.
+        },
+        "title": {
+            "text":"Time"
+            },
+        "series":[
+            {"values":[0]}
+        ]
+    };
+    
+    race.hrGaugeJson = {
+        "type":"gauge", 
+        "scale-r":{
+            "aperture":300,     //Specify your scale range.
+            "values":"50:220:10" //Provide min/max/step scale values.
+        },
+        "title": {
+            "text":"Heart Rate"
             },
         "series":[
             {"values":[0]}
@@ -90,9 +124,15 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         race.thisRaceData.push(data);
         if (moment().diff(nextUpdateTime) >= 0) {  // time to update the graph?
             race.rpmValues.push([data.elapsedTime,data.rpm]);
-            race.distanceValues.push([data.elapsedTime,data.disance]);            
-            race.rpmGaugeJson.series[0].values = [data.rpm];
+            race.distanceValues.push([data.elapsedTime,data.distance]);
+            race.hrValues.push([data.elapsedTime,data.bpm]);            
+            race.rpmGaugeJson.series[0].values = [data.rpm];   
+            race.timeGaugeJson.series[0].values = [data.elapsedTime];
+            race.hrGaugeJson.series[0].values = [data.bpm];
             nextUpdateTime = nextUpdateTime.add(graphUpdateInterval, 'ms'); // set next update time
+        }
+        else{
+            console.log("skipping GUI update");
         }
     });
   
@@ -100,6 +140,7 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         race.thisRaceData = [];
         race.distanceValues.length = 0;
         race.rpmValues.length = 0;
+        race.hrValues.length = 0;
         console.log(this.playerName);
         mySocket.emit('start', { "playerName": this.playerName});
     };
