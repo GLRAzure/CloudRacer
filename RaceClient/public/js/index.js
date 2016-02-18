@@ -61,6 +61,20 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
                 }
         ]
     };
+    
+    race.rpmGaugeJson = {
+        "type":"gauge", 
+        "scale-r":{
+            "aperture":300,     //Specify your scale range.
+            "values":"0:120:10" //Provide min/max/step scale values.
+        },
+        "title": {
+            "text":"RPM"
+            },
+        "series":[
+            {"values":[0]}
+        ]
+    };
 
     var momStart;
     var nextUpdateTime;
@@ -77,6 +91,7 @@ app.controller('CloudRacerLiveRaceController', function($scope, mySocket) {
         if (moment().diff(nextUpdateTime) >= 0) {  // time to update the graph?
             race.rpmValues.push([data.elapsedTime,data.rpm]);
             race.distanceValues.push([data.elapsedTime,data.disance]);            
+            race.rpmGaugeJson.series[0].values = [data.rpm];
             nextUpdateTime = nextUpdateTime.add(graphUpdateInterval, 'ms'); // set next update time
         }
     });

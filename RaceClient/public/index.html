@@ -32,12 +32,28 @@
             <div class='row'>
                 <div class='col-xs-12'>
                       <div ng-controller="CloudRacerLiveRaceController as race">
-                        <zingchart id="myChart" zc-json="race.raceChartJson" zc-height=500 zc-width=800></zingchart>
-                        <form ng-submit="race.startrace()">
-                        <input type="text" ng-model="race.playerName" size="30" placeholder="Enter Player's Name">
-                        <input class="btn-primary" type="submit" value="Start">
-                        </form>
-                        <button ng-click="race.sendBandData()">send</button>                      
+                          <div class='container-fluid'>
+                              <div class='row'>
+                                  <div class='col-xs-4'>
+                                    <zingchart id="myChart2" zc-json="race.rpmGaugeJson" zc-height=300 zc-width=300></zingchart>
+                                  </div>
+                              </div>
+                              <div class='row'>
+                                  <div class='col-xs-12'>
+                                    <zingchart id="myChart" zc-json="race.raceChartJson" zc-height=300 zc-width=800></zingchart>
+                                </div>
+                              </div>
+                              <div class='row'>
+                                  <div class='col-xs-12'>
+                                    <form ng-submit="race.startrace()">
+                                    <input type="text" ng-model="race.playerName" size="30" placeholder="Enter Player's Name">
+                                    <input class="btn-primary" type="submit" value="Start">
+                                    </form>
+                                    <button ng-click="race.sendBandData()">send</button>
+                                  </div>
+                              </div>
+                           </div>
+                        </div>                   
                     </div>    
                 </div>
             </div>
