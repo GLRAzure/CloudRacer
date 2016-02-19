@@ -9,11 +9,13 @@ const int RPM_INTERVAL = 100; //ms
 const int RPM_SAMPLES = 10;
 
 int prevReed;
-int latchTime = 1; // ms
+int latchTime = 80; // ms
 int reportInterval = 50; //ms
 uint32_t nextReadTime = millis();
 uint32_t nextReportTime = 0;
 uint32_t nextSampleTime = millis();
+uint32_t lastPulseTime = millis();
+uint32_t timeBetweenPulses = 99999999;
 volatile uint32_t rotations = 0;
 volatile uint32_t curRPM = 0;
 uint32_t readings[RPM_SAMPLES];
@@ -34,8 +36,14 @@ void loop() {
   if ((reed != prevReed) && (millis() >= nextReadTime)) {
     prevReed = reed;
     nextReadTime = millis() + latchTime;
-    if (!reed) rotations++;
-  }
+    if (!reed) 
+    {
+      rotations++;
+      timeBetweenPulses = millis() - lastPulseTime;
+      lastPulseTime = millis();      
+    }
+   }
+   
 
 
   if (millis() >= nextSampleTime)
@@ -43,6 +51,7 @@ void loop() {
     uint32_t outgoingReading = readings[curReadingIndex];
     readings[curReadingIndex] = rotations;
     curRPM = (rotations - outgoingReading) * 6000 / RPM_INTERVAL / RPM_SAMPLES;
+    
     nextSampleTime += RPM_INTERVAL;
 
     curReadingIndex++;
@@ -60,7 +69,9 @@ void loop() {
   	Serial.print(", \"rotations\": ");
   	Serial.print(rotations, DEC);
     Serial.print(", \"rpm\": ");
-    Serial.print(curRPM, DEC);
+    // Serial.print(curRPM, DEC);
+    Serial.print(20000/ (timeBetweenPulses), DEC); // 3 wheel rotations per pedal rotation
+    
   	Serial.println("}");
   }
 }
