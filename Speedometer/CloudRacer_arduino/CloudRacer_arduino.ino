@@ -9,7 +9,7 @@ const int RPM_INTERVAL = 100; //ms
 const int RPM_SAMPLES = 10;
 
 int prevReed;
-int latchTime = 80; // ms
+int latchTime = 20; // ms
 int reportInterval = 50; //ms
 uint32_t nextReadTime = millis();
 uint32_t nextReportTime = 0;
@@ -39,6 +39,9 @@ void loop() {
     if (!reed) 
     {
       rotations++;
+    }
+    else
+    {
       timeBetweenPulses = millis() - lastPulseTime;
       lastPulseTime = millis();      
     }
@@ -70,7 +73,7 @@ void loop() {
   	Serial.print(rotations, DEC);
     Serial.print(", \"rpm\": ");
     // Serial.print(curRPM, DEC);
-    Serial.print(20000/ (timeBetweenPulses), DEC); // 3 wheel rotations per pedal rotation
+    Serial.print(10000/ (timeBetweenPulses), DEC); // 3 wheel rotations per pedal rotation, 2 magnets
     
   	Serial.println("}");
   }
