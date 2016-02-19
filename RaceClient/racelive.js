@@ -50,7 +50,7 @@ racelive.updateRace = function(data) {
         rpm: data.rpm,
         startRotations: this.startRotations,
         rotations: data.rotations,
-        distance: ((data.rotations-data.startRotations)*config.wheelCirc)/config.mmInMi,
+        distance: ((data.rotations-this.startRotations)*config.wheelCirc)/config.mmInMi,
         bpm: data.bpm,
         acceleration: 0
     };
@@ -90,12 +90,12 @@ racelive._updateRaceResults = function (data) {
         request.input('playerName', data.playerName);
         request.input('startTime', new Date(data.startTime));
         request.input('endTime', new Date(data.endTime));
-        request.input('distance', data.distance);
-        request.input('maxSpeed', racelive.raceStats.maxSpeed);
-        request.input('maxDistancePerBeat', 0);
-        request.input('maxAcceleration', 0);
-        request.input('maxAccelPerBeat', 0);
-        request.input('maxBPM', racelive.raceStats.maxBPM);
+        request.input('distance', sql.Decimal(18,4), data.distance);
+        request.input('maxSpeed', sql.Decimal(18,4), racelive.raceStats.maxSpeed);
+        request.input('maxDistancePerBeat', sql.Decimal(18,4), 0);
+        request.input('maxAcceleration', sql.Decimal(18,4), 0);
+        request.input('maxAccelPerBeat', sql.Decimal(18,4), 0);
+        request.input('maxBPM', sql.Decimal(18,4), racelive.raceStats.maxBPM);
         //request.input('sensordata', JSON.stringify(this.raceStats.sensorData));
         
         var query = 'insert into raceResults (playerName, startTime, endTime, distance, maxSpeed, maxDistancePerBeat, maxAcceleration, maxAccelPerBeat, maxBPM) '+
