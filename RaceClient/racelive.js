@@ -52,7 +52,7 @@ racelive.updateRace = function(data) {
         rpm: data.rpm,
         startRotations: this.startRotations,
         rotations: data.rotations,
-        distance: ((data.distance-this.startDistance)*config.mToMi,
+        distance: (data.distance-this.startDistance)*config.mToMi,
         bpm: data.bpm,
         acceleration: 0
     };
