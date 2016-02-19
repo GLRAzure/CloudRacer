@@ -93,7 +93,7 @@ racelive._updateRaceResults = function (data) {
         request.input('distance', sql.Decimal(18,4), data.distance);
         request.input('maxSpeed', sql.Decimal(18,4), racelive.raceStats.maxSpeed);
         request.input('maxDistancePerBeat', sql.Decimal(18,4), 0);
-        request.input('maxAcceleration', sql.Decimal(18,4), 0);
+        request.input('maxAcceleration', sql.Decimal(18,4), racelive.raceStats.maxAcceleration);
         request.input('maxAccelPerBeat', sql.Decimal(18,4), 0);
         request.input('maxBPM', sql.Decimal(18,4), racelive.raceStats.maxBPM);
         //request.input('sensordata', JSON.stringify(this.raceStats.sensorData));
