@@ -11,6 +11,7 @@ racelive.playerName;
 racelive.startTime;
 racelive.endTime;
 racelive.startRotations;
+racelive.startDistance;
 racelive.sensordata = [];
 racelive.activeRace = false;
 racelive._io;
@@ -25,6 +26,7 @@ racelive.start = function(playerInfo, lastSensorReading, io){
     console.log('Starting race for player %s', playerInfo.playerName);
     this.playerName = playerInfo.playerName;
     this.startTime = moment();
+    this.startDistance = lastSensorReading.distance;
     this.endTime = moment(racelive.startTime).add(config.raceLength,'milliseconds');
     this.startRotations = lastSensorReading.rotations;
     this.sensorData =  [lastSensorReading];
@@ -50,7 +52,7 @@ racelive.updateRace = function(data) {
         rpm: data.rpm,
         startRotations: this.startRotations,
         rotations: data.rotations,
-        distance: ((data.rotations-this.startRotations)*config.wheelCirc)/config.mmInMi,
+        distance: ((data.distance-this.startDistance)*config.mToMi,
         bpm: data.bpm,
         acceleration: 0
     };

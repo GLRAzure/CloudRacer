@@ -4,6 +4,7 @@ config.deviceId = 'VID_2341&PID_8036';
 config.raceLength = 30000;
 config.wheelCirc = 2199; // in mm
 config.mmInMi = 1609344;
+config.mToMi = 0.00062137;
 
 config.tablestorage = {
 	tableName: "cloudracertelemetry",

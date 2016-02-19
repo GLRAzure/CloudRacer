@@ -8,6 +8,7 @@ var speedometer = {};
 speedometer.lastReading = {
     rotations: 0,
     rpm: 0,
+    distance: 0,
     readingTime: 0
 };
 
@@ -17,9 +18,9 @@ speedometer.connect = function(callbackData, callbackError, callbackClose, callb
         if (_.isUndefined(COMport)) {
             console.log("Bike sensor not found. virtual sensor data will be returned.");
             
-            var data = '{ "rotations": 0, "rpm": 0 }';
+            var data = '{ "rotations": 0, "distance": 0, rpm": 0 }';
             setInterval(function(data) {
-                data = '{ "rotations": 0, "rpm": ' + Math.floor((Math.random() * 10) + 1) + ' }';
+                data = '{ "rotations": 0, "distance": ' + Math.floor((Math.random() * 10) + 1) + ',"rpm": ' + Math.floor((Math.random() * 10) + 1) + ' }';
                 serialData(data, callbackData);
             }, 20, data);
 
