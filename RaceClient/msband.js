@@ -21,7 +21,7 @@ msband._socketData = function(data, callbackData) {
     this.lastReading.bpm = output.bpm;
     console.log("Band Data Received: %s", data);
     
-    if(!_.isUndefined(callbackData)) { callbackData(this.lastReading)}
+    if(!_.isUndefined(callbackData)) {callbackData(this.lastReading)}
 };
 
 msband.disconnect = function (data) {

@@ -46,7 +46,7 @@ function serialData(serialtext, callbackData) {
     var data;
     try {
         data = JSON.parse(serialtext);
-        console.log("Data: %s", serialtext);
+        //console.log("Data: %s", serialtext);
 
     } catch (e) {
         console.log("Malformed JSON received: %s", e);
